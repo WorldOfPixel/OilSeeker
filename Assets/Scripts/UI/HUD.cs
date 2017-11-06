@@ -6,7 +6,7 @@ public class HUD : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		int a = 0;
 	}
 	
 	// Update is called once per frame
