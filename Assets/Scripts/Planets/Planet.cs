@@ -109,8 +109,8 @@ public class Planet : MonoBehaviour {
 			Chunk currentChunk = Instantiate(chunk, new Vector3(x, y, 0f), Quaternion.identity);
 			currentChunk.GenerateChunkData();
 
-			int x1 = x / ChunkData.size / ChunkData.size;
-			int y1 = y / ChunkData.size / ChunkData.size;
+			int x1 = x / ChunkData.size;
+			int y1 = y / ChunkData.size;
 
 			if(x1 < 0) x1 = PlanetData.sizeX / ChunkData.size - 1;  //TODO fix 00
 			if(x1 > PlanetData.sizeX / ChunkData.size - 1) x1 = 0;  //TODO fix 00
