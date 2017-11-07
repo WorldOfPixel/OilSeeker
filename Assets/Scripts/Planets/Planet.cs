@@ -3,14 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlanetData {
-	public static int sizeX = 128;
-	public static int sizeY = 32;
+	public static int sizeX = 1024;
+	public static int sizeY = 1024;
 	public float [,] data;
 	public PlanetData()
 	{
 		data = new float[sizeX, sizeY];
+
+		for(int i = 0; i < PlanetData.sizeX; i++)
+		{
+			for(int j = 0; j < PlanetData.sizeY; j++)
+			{
+				if(i == 0 || i == PlanetData.sizeX - 1 || j == 0 || j == PlanetData.sizeY - 1)
+					data[i, j] = 1;
+				else
+					data[i, j] = 0;
+			}
+		}
 	}
-	
 }
 
 public class ChunkData {
@@ -26,8 +36,8 @@ public class ChunkData {
 }
 
 public class Planet : MonoBehaviour {
-	public PlanetData planetData;
-	public ChunkData [,] chunkData;
+	//public PlanetData planetData;
+	public PlanetGenerator planetData;
 	public Chunk chunk;
 	public GameObject player;
 	public float renderDist = 4;
@@ -37,9 +47,8 @@ public class Planet : MonoBehaviour {
 	{
 		player = GameObject.FindWithTag("Player");
 		chunkMap = new Dictionary<Vector2, Chunk>();
-
-		GeneratePlanetData();
-		GenerateChunkData();
+		planetData = new PlanetGenerator();
+		planetData.Run();
 	}
 	
 	// Update is called once per frame
@@ -49,50 +58,14 @@ public class Planet : MonoBehaviour {
 		DeleteChunks();
 	}
 
-	void GeneratePlanetData()
-	{
-		planetData = new PlanetData();
-
-		for(int i = 0; i < PlanetData.sizeX; i++)
-		{
-			for(int j = 0; j < PlanetData.sizeY; j++)
-			{
-				planetData.data[i, j] = 0;
-			}
-		}
-	}
-
-	void GenerateChunkData()
-	{
-		int chunkDataX = PlanetData.sizeX / ChunkData.size;
-		int chunkDataY = PlanetData.sizeY / ChunkData.size;
-
-		chunkData = new ChunkData[chunkDataX, chunkDataY];
-
-		for(int i = 0; i < chunkDataX; i++)
-		{
-			for(int j = 0; j < chunkDataY; j++)
-			{
-				for(int i1 = 0; i1 < ChunkData.size; i1++)
-				{
-					for(int j1 = 0; j1 < ChunkData.size; j1++)
-					{
-						chunkData[i, j] = new ChunkData();
-						chunkData[i, j].data[i1, j1] = planetData.data[i1 + (i * ChunkData.size), j1 + (j * ChunkData.size)];
-					}
-				}
-			}
-		}
-	}
-
 	void FindChunksToLoad()
 	{
 		int x = (int)transform.position.x;
 		int y = (int)transform.position.y;
 
-		for(int i = x - ChunkData.size; i < x + (2 * ChunkData.size); i += ChunkData.size)
+		for(int i = x - ChunkData.size * 2; i < x + (4 * ChunkData.size); i += ChunkData.size)
 		{
-			for(int j = y - ChunkData.size; j < y + (2 * ChunkData.size); j += ChunkData.size)
+			for(int j = y - ChunkData.size * 2; j < y + (4 * ChunkData.size); j += ChunkData.size)
 			{
 				MakeChunkAt(i, j);
 			}
@@ -106,21 +79,29 @@ public class Planet : MonoBehaviour {
 
 		if(chunkMap.ContainsKey(new Vector2(x, y)) == false)
 		{
-			Chunk currentChunk = Instantiate(chunk, new Vector3(x, y, 0f), Quaternion.identity);
-			currentChunk.GenerateChunkData();
-
 			int x1 = x / ChunkData.size;
 			int y1 = y / ChunkData.size;
 
-			if(x1 < 0) x1 = PlanetData.sizeX / ChunkData.size - 1;  //TODO fix 00
-			if(x1 > PlanetData.sizeX / ChunkData.size - 1) x1 = 0;  //TODO fix 00
+			if(x1 < 0)
+				x1 = (PlanetGenerator.sizeX / ChunkData.size) - Mathf.Abs((x1 - (Mathf.FloorToInt(x1 / (PlanetGenerator.sizeX / ChunkData.size)) * (PlanetGenerator.sizeX / ChunkData.size))));
 
-			Debug.Log(x1);
+			if(x1 > PlanetGenerator.sizeX / ChunkData.size - 1) 
+				x1 = (x1 - (Mathf.FloorToInt(x1 / (PlanetGenerator.sizeX / ChunkData.size)) * (PlanetGenerator.sizeX / ChunkData.size)));
 
 			if(y1 < 0) return;
-			if(y1 > PlanetData.sizeY / ChunkData.size - 1) return;
+			if(y1 > PlanetGenerator.sizeY / ChunkData.size - 1) return;
 
-			currentChunk.chunkData.data = chunkData[x1, y1].data;
+			Chunk currentChunk = Instantiate(chunk, new Vector3(x, y, 0f), Quaternion.identity);
+			currentChunk.GenerateChunkData();
+
+			for(int i = 0; i < ChunkData.size; i++)
+			{
+				for(int j = 0; j < ChunkData.size; j++)
+				{
+					currentChunk.chunkData.data[i, j] = (float)planetData.data[(x1 * ChunkData.size) + i, (y1 * ChunkData.size) + j];
+				}
+			}
+
 			currentChunk.MakeChunk();
 			chunkMap.Add(new Vector2(x, y), currentChunk);
 		}

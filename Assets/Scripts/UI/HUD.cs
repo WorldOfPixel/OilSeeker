@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class HUD : MonoBehaviour {
 
+	//public Button buttonStart;
+	
 	// Use this for initialization
 	void Start () {
 		
