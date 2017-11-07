@@ -27,7 +27,7 @@ public class ChunkData {
 
 public class Planet : MonoBehaviour {
 	public PlanetData planetData;
-	public ChunkData [,] chunkData;
+	//public ChunkData [,] chunkData;
 	public Chunk chunk;
 	public GameObject player;
 	public float renderDist = 4;
@@ -39,7 +39,7 @@ public class Planet : MonoBehaviour {
 		chunkMap = new Dictionary<Vector2, Chunk>();
 
 		GeneratePlanetData();
-		GenerateChunkData();
+		//GenerateChunkData();
 	}
 	
 	// Update is called once per frame
@@ -57,33 +57,36 @@ public class Planet : MonoBehaviour {
 		{
 			for(int j = 0; j < PlanetData.sizeY; j++)
 			{
-				planetData.data[i, j] = 0;
+				if(i == 0 || i == PlanetData.sizeX - 1 || j == 0 || j == PlanetData.sizeY - 1)
+					planetData.data[i, j] = 1;
+				else
+					planetData.data[i, j] = 0;
 			}
 		}
 	}
 
-	void GenerateChunkData()
-	{
-		int chunkDataX = PlanetData.sizeX / ChunkData.size;
-		int chunkDataY = PlanetData.sizeY / ChunkData.size;
+	// void GenerateChunkData()
+	// {
+	// 	int chunkDataX = PlanetData.sizeX / ChunkData.size;
+	// 	int chunkDataY = PlanetData.sizeY / ChunkData.size;
 
-		chunkData = new ChunkData[chunkDataX, chunkDataY];
+	// 	chunkData = new ChunkData[chunkDataX, chunkDataY];
 
-		for(int i = 0; i < chunkDataX; i++)
-		{
-			for(int j = 0; j < chunkDataY; j++)
-			{
-				for(int i1 = 0; i1 < ChunkData.size; i1++)
-				{
-					for(int j1 = 0; j1 < ChunkData.size; j1++)
-					{
-						chunkData[i, j] = new ChunkData();
-						chunkData[i, j].data[i1, j1] = planetData.data[i1 + (i * ChunkData.size), j1 + (j * ChunkData.size)];
-					}
-				}
-			}
-		}
-	}
+	// 	for(int i = 0; i < chunkDataX; i++)
+	// 	{
+	// 		for(int j = 0; j < chunkDataY; j++)
+	// 		{
+	// 			for(int i1 = 0; i1 < ChunkData.size; i1++)
+	// 			{
+	// 				for(int j1 = 0; j1 < ChunkData.size; j1++)
+	// 				{
+	// 					chunkData[i, j] = new ChunkData();
+	// 					chunkData[i, j].data[i1, j1] = planetData.data[i1 + (i * ChunkData.size), j1 + (j * ChunkData.size)];
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	void FindChunksToLoad()
 	{
@@ -106,21 +109,29 @@ public class Planet : MonoBehaviour {
 
 		if(chunkMap.ContainsKey(new Vector2(x, y)) == false)
 		{
-			Chunk currentChunk = Instantiate(chunk, new Vector3(x, y, 0f), Quaternion.identity);
-			currentChunk.GenerateChunkData();
-
 			int x1 = x / ChunkData.size;
 			int y1 = y / ChunkData.size;
 
-			if(x1 < 0) x1 = PlanetData.sizeX / ChunkData.size - 1;  //TODO fix 00
-			if(x1 > PlanetData.sizeX / ChunkData.size - 1) x1 = 0;  //TODO fix 00
+			if(x1 < 0)
+				x1 = (PlanetData.sizeX / ChunkData.size) - Mathf.Abs((x1 - (Mathf.FloorToInt(x1 / (PlanetData.sizeX / ChunkData.size)) * (PlanetData.sizeX / ChunkData.size))));
 
-			Debug.Log(x1);
+			if(x1 > PlanetData.sizeX / ChunkData.size - 1) 
+				x1 = (x1 - (Mathf.FloorToInt(x1 / (PlanetData.sizeX / ChunkData.size)) * (PlanetData.sizeX / ChunkData.size)));
 
 			if(y1 < 0) return;
 			if(y1 > PlanetData.sizeY / ChunkData.size - 1) return;
 
-			currentChunk.chunkData.data = chunkData[x1, y1].data;
+			Chunk currentChunk = Instantiate(chunk, new Vector3(x, y, 0f), Quaternion.identity);
+			currentChunk.GenerateChunkData();
+
+			for(int i = 0; i < ChunkData.size; i++)
+			{
+				for(int j = 0; j < ChunkData.size; j++)
+				{
+					currentChunk.chunkData.data[i, j] = planetData.data[(x1 * ChunkData.size) + i, (y1 * ChunkData.size) + j];
+				}
+			}
+			
 			currentChunk.MakeChunk();
 			chunkMap.Add(new Vector2(x, y), currentChunk);
 		}
