@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f50bb0faac9259345aae306dbede8290, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRandomTile: 1
+  isRandomTile: 0
   sprites:
   - {fileID: 21300000, guid: c8330edabd097874b921dc2b23396c3b, type: 3}
   - {fileID: 21300000, guid: d818f55b025a2864785dfffb66a53ff4, type: 3}
