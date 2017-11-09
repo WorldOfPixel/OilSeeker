@@ -34,9 +34,9 @@ public class Chunk : MonoBehaviour {
 			{
 				int tileIndex = (int)chunkData.data[i + ChunkData.size / 2, j + ChunkData.size / 2];
 				if(tileIndex == -1)
-					return;
+					continue;
 					
-				Tile tile = Instantiate(tiles[tileIndex], new Vector3(transform.position.x + (float)i * (Tile.SIZE / 1f), transform.position.y + (float)j * (Tile.SIZE / 1f), 0f), Quaternion.identity);
+				Tile tile = Instantiate(tiles[tileIndex], new Vector3(transform.position.x + (float)i, transform.position.y + (float)j, 0f), Quaternion.identity);
 				tile.transform.SetParent(this.transform);
 			}
 		}

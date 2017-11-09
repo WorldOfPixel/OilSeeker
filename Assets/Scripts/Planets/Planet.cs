@@ -83,13 +83,13 @@ public class Planet : MonoBehaviour {
 			int y1 = y / ChunkData.size;
 
 			if(x1 < 0)
-				x1 = (PlanetGenerator.sizeX / ChunkData.size) - Mathf.Abs((x1 - (Mathf.FloorToInt(x1 / (PlanetGenerator.sizeX / ChunkData.size)) * (PlanetGenerator.sizeX / ChunkData.size))));
+				x1 = (PlanetGenerator.width / ChunkData.size) - Mathf.Abs((x1 - (Mathf.FloorToInt(x1 / (PlanetGenerator.width / ChunkData.size)) * (PlanetGenerator.width / ChunkData.size))));
 
-			if(x1 > PlanetGenerator.sizeX / ChunkData.size - 1) 
-				x1 = (x1 - (Mathf.FloorToInt(x1 / (PlanetGenerator.sizeX / ChunkData.size)) * (PlanetGenerator.sizeX / ChunkData.size)));
+			if(x1 > PlanetGenerator.width / ChunkData.size - 1) 
+				x1 = (x1 - (Mathf.FloorToInt(x1 / (PlanetGenerator.width / ChunkData.size)) * (PlanetGenerator.width / ChunkData.size)));
 
 			if(y1 < 0) return;
-			if(y1 > PlanetGenerator.sizeY / ChunkData.size - 1) return;
+			if(y1 > PlanetGenerator.height/ ChunkData.size - 1) return;
 
 			Chunk currentChunk = Instantiate(chunk, new Vector3(x, y, 0f), Quaternion.identity);
 			currentChunk.GenerateChunkData();

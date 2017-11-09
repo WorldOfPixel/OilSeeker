@@ -78,10 +78,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df78244b84fb0b94c9ad751f34c6ace0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRandomTile: 1
+  isRandomTile: 0
   sprites:
-  - {fileID: 21300000, guid: fed442c8dcbd8904d8c1d1980fd7c1ea, type: 3}
   - {fileID: 21300000, guid: 916e2bdf2fb4965469164487046c6785, type: 3}
+  - {fileID: 21300000, guid: fed442c8dcbd8904d8c1d1980fd7c1ea, type: 3}
 --- !u!212 &212786867151080528
 SpriteRenderer:
   m_ObjectHideFlags: 1
