@@ -3,11 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlanetGenerator {
-	public static int sizeX = 512;
-	public static int sizeY = 64;
+	public static int sizeX = 1024;
+	public static int sizeY = 256;
 	public int [,] data;
+	private int [] layerHeight;
+	private int layersSize = 10;
+
+	void SetLayers()
+	{
+		layerHeight = new int[layersSize];
+		int k = sizeY / layersSize;
+		for(int i = 0; i < layersSize; i++)
+		{
+			layerHeight[i] = k * (i + 1);
+		}
+	}
+
 	public void Run()
 	{
+		SetLayers();
+
 		GenerateShell();
 		GenerateTerrain();
 		GenerateMines();
@@ -17,21 +32,24 @@ public class PlanetGenerator {
 		data = new int[sizeX, sizeY];
 		for(int i = 0; i < sizeX; i++)
 			for(int j = 0; j < sizeY; j++)
-				data[i, j] = 0;
+				data[i, j] = -1;
 	}
 	void GenerateTerrain()
 	{
+		Debug.Log(GetNoise(0, 1));
+		Debug.Log(GetNoise(0, 2));
+		Debug.Log(GetNoise(0, 3));
+		Debug.Log(GetNoise(0, 4));
+
+		
 		for(int i = 0; i < sizeX; i++)
 		{
 			for(int j = 0; j < sizeY; j++)
 			{
-				if(j == 12)
+				int height = GetNoise((float)j / 32, (float)i / 32);
+				for(int k = 0; k < sizeY - height; k++)
 				{
-					int perlin = Mathf.RoundToInt(GetNoise(i + 4) * 24);
-					for(int k = 0; k < sizeY - perlin; k++)
-					{
-						data[i, k] = 1;
-					}
+					data[i, k] = 0;
 				}
 			}
 		}
@@ -40,9 +58,10 @@ public class PlanetGenerator {
 	{
 
 	}
-	float GetNoise(float x)
+	int GetNoise(float x, float y)
 	{
-		float noise = Mathf.PerlinNoise(x  * (1 / (float)(sizeX / 3f)), x  * (1 / (float)(sizeX / 3f))); 
-		return noise;
+		float scale = 64f;
+		float noise = Mathf.PerlinNoise(1.0f / (x + 1), 1.0f / (y + 1)); 
+		return (int)(noise * scale);
 	}
 }
