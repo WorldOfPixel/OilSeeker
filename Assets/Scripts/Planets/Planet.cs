@@ -103,6 +103,7 @@ public class Planet : MonoBehaviour {
 			}
 
 			currentChunk.MakeChunk();
+
 			chunkMap.Add(new Vector2(x, y), currentChunk);
 		}
 	}
