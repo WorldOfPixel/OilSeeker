@@ -102,6 +102,7 @@ public class PlanetGenerator {
 		GenerateTerrain();
 		GenerateMines(8, 64, 2, 128, height - 64, height - 16);
 		GenerateMinerals(8, 128, 8, 256, height - 64, height - 28);
+		GenerateTunnels(-1, 128, 1, 256, 1024, 0, height);
 
 		isLoad = true;
 	}
@@ -198,6 +199,37 @@ public class PlanetGenerator {
 				ypos += Random.Range(-1, 2);
             }
         }
+	}
+
+	void GenerateTunnels(int tile, int numOfTunnels, int holeSize, int tMinSize, int tMaxSize, int minDepth, int maxDepth)
+	{
+		for(int i = 0; i < numOfTunnels; i++)
+		{
+			int xpos = 0;
+			int ypos = 0;
+
+			int tSize = Random.Range(tMinSize, tMaxSize);
+			xpos = Random.Range(0, width);
+			ypos = Random.Range(minDepth, maxDepth);
+
+			for(int j = 0; j < tSize; j++)
+			{
+				for(int x = -holeSize; x <= holeSize; x++)
+				{
+					for(int y = -holeSize; y <= holeSize; y++)
+					{
+						xpos += x;
+						ypos += y;
+
+						if(xpos >= 0 && xpos < width && ypos >= minDepth && ypos < maxDepth) // Verify borders 
+							data[xpos, ypos] = (int)tile;
+					}
+				}
+	
+				xpos += Mathf.RoundToInt(GetNoise(i, j, 2f, 1f) * Random.Range(-1, 2)); 
+				ypos += Mathf.RoundToInt(GetNoise(i, j, 2f, 1f) * Random.Range(-1, 2)); 
+			}
+		}
 	}
 
 	int GetNoise(int x, int y, float scale, float smoothness)
