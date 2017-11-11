@@ -37,6 +37,12 @@ public class Chunk : MonoBehaviour {
 					continue;
 					
 				Tile tile = Instantiate(tiles[tileIndex], new Vector3(transform.position.x + (float)i, transform.position.y + (float)j, 0f), Quaternion.identity);
+
+				tile.chunkX = x;
+				tile.chunkY = y;
+				tile.x = i + ChunkData.size / 2;
+				tile.y = j + ChunkData.size / 2;
+
 				tile.transform.SetParent(this.transform);
 			}
 		}

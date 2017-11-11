@@ -1,25 +1,109 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 using UnityEngine;
 
+[System.Serializable]
+ public class PlanetData 
+ {
+	public int width = 1024;
+	public int height = 256;
+	public int [,] data;
+
+	public PlanetData(int width, int height)
+	{
+		this.width = width;
+		this.height = height;
+
+		data = new int[this.width, this.height];
+	}
+}
+
 public class PlanetGenerator {
+	public static PlanetGenerator Instance;
+
 	public int seed;
-	public static int width = 1024;
-	public static int height = 256;
+	public int width = 1024;
+	public int height = 256;
 
 	public float scale = 16f;
 	public float smoothness = 2f;
 
 	public int [,] data;
+	public bool isLoad {private set; get;}
 
-	public void Run()
+	public static PlanetGenerator getInstance()
+    {
+        if (Instance == null)
+            Instance = new PlanetGenerator();
+        return Instance;
+    }
+
+	public void Save()
 	{
+		BinaryFormatter bf = new BinaryFormatter();
+
+		if(!File.Exists(Application.dataPath + "/Planet.dat"))
+			File.Create(Application.dataPath + "/Planet.dat");
+
+		FileStream file = File.Open(Application.dataPath + "/Planet.dat", FileMode.Open);
+
+		PlanetData planetData = new PlanetData(width, height);
+
+		for(int i = 0; i < width; i++)
+		{
+			for(int j = 0; j < height; j++)
+			{
+				planetData.data[i, j] = data[i, j];
+			}
+		}
+
+		bf.Serialize(file, planetData);
+		file.Close();
+	}
+	
+	public void Load()
+	{
+		isLoad = false;
+
+		if(File.Exists(Application.dataPath + "/Planet.dat"))
+		{
+			BinaryFormatter bf = new BinaryFormatter();
+			FileStream file = File.Open(Application.dataPath + "/Planet.dat", FileMode.Open);
+
+			PlanetData planetData = (PlanetData)bf.Deserialize(file);
+			file.Close();
+
+			width = planetData.width;
+			height = planetData.height;
+
+			data = new int[width, height];
+
+			for(int i = 0; i < width; i++)
+			{
+				for(int j = 0; j < height; j++)
+				{
+					data[i, j] = planetData.data[i, j];
+				}
+			}
+		}
+
+		isLoad = true;
+	}
+
+	public void Generate()
+	{
+		isLoad = false;
+
 		seed = Random.Range(0, 999);
 		data = new int[width, height];
 
 		GenerateTerrain();
 		GenerateMines(8, 64, 2, 128, height - 64, height - 16);
 		GenerateMinerals(8, 128, 8, 256, height - 64, height - 28);
+
+		isLoad = true;
 	}
 
 	void GenerateTerrain()

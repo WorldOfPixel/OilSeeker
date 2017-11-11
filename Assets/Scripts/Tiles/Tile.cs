@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Tile : MonoBehaviour {
+	public int chunkX;
+	public int chunkY;
+	public int x;
+	public int y;
 	public bool isRandomTile;
 	public Sprite [] sprites;
 	public static float SIZE = 1f;
@@ -20,5 +24,10 @@ public class Tile : MonoBehaviour {
 	void Update () 
 	{
 		
+	}
+
+	void OnClick()
+	{
+		Debug.Log("Click on tile");
 	}
 }
