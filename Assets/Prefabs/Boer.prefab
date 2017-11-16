@@ -51,3 +51,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be3c29368c775cb41943b2021fb8bd4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tilePanel: {fileID: 1072636971810780, guid: cdf388d9514f7f448b35265f81ab3ff1, type: 2}

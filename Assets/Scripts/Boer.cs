@@ -1,19 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
-public class Boer : MonoBehaviour {
+using UnityEngine.UI;
 
+public class Boer : MonoBehaviour {
+	public int damage = 300;
+	private GameObject tilePanel;
 	// Use this for initialization
 	void Start () 
 	{
-
+		tilePanel = GameObject.Find("TilePanel");
+		tilePanel.SetActive(false);
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if (Input.GetMouseButtonUp(0)) {
+		if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) ) {
 			if(Camera.main.gameObject == null)
 				return;
 
@@ -31,13 +34,26 @@ public class Boer : MonoBehaviour {
 					int x = hit.collider.gameObject.GetComponent<Tile>().x;
 					int y = hit.collider.gameObject.GetComponent<Tile>().y;
 
-					//Debug.Log(chunkX);
-					//Debug.Log(chunkY);
+					Text[] text = tilePanel.GetComponentsInChildren<Text>();
+					text[0].text = hit.collider.gameObject.GetComponent<Tile>().data.type.ToString();
+					text[1].text = "AMOUNT: " + hit.collider.gameObject.GetComponent<Tile>().data.amount.ToString();
+					text[2].text = "ENDURANCE: " + hit.collider.gameObject.GetComponent<Tile>().data.endurance.ToString();
 
-					PlanetGenerator.getInstance().data[chunkX * ChunkData.size + x, chunkY * ChunkData.size + y] = -1;
-    				Destroy(hit.collider.gameObject);
+					tilePanel.transform.position = new Vector3(mousePos2D.x, mousePos2D.y, -1f);
+
+					if(Input.GetMouseButton(0)){
+						Debug.Log(PlanetGenerator.getInstance().data[chunkX * ChunkData.size + x, chunkY * ChunkData.size + y].amount);
+						Debug.Log(hit.collider.gameObject.GetComponent<Tile>().data.amount);
+						PlanetGenerator.getInstance().data[chunkX * ChunkData.size + x, chunkY * ChunkData.size + y].SetTileAmount(damage);
+						hit.collider.gameObject.GetComponent<Tile>().data.SetTileAmount(damage);
+						tilePanel.SetActive(false);
+					}
+					if(Input.GetMouseButton(1)){
+						tilePanel.SetActive(true);
+					}
 				}
 			}
+			
 		}
 	}
 }

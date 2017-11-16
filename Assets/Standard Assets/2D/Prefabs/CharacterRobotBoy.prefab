@@ -323,6 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be3c29368c775cb41943b2021fb8bd4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tilePanel: {fileID: 0}
 --- !u!114 &114508470856946146
 MonoBehaviour:
   m_ObjectHideFlags: 1
