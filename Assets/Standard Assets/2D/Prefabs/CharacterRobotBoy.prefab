@@ -30,7 +30,7 @@ GameObject:
   - component: {fileID: 11400002}
   - component: {fileID: 11400000}
   - component: {fileID: 6100000}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CharacterRobotBoy
   m_TagString: Player
   m_Icon: {fileID: 0}
