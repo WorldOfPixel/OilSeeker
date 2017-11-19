@@ -7,11 +7,11 @@ public class ChunkData {
 	public static int size = 8;
 	public int x;
 	public int y; 
-	public float [,] data = new float[size, size];
+	public TileData [,] data;
 
 	public ChunkData()
 	{
-		data = new float[size, size];
+		data = new TileData[size, size];
 	}
 }
 
@@ -74,7 +74,10 @@ public class Planet : MonoBehaviour {
 			{
 				for(int j = 0; j < ChunkData.size; j++)
 				{
-					currentChunk.chunkData.data[i, j] = (float)PlanetGenerator.getInstance().data[(x1 * ChunkData.size) + i, (y1 * ChunkData.size) + j];
+					currentChunk.chunkData.data[i, j] = new TileData();
+					currentChunk.chunkData.data[i, j].type = PlanetGenerator.getInstance().data[(x1 * ChunkData.size) + i, (y1 * ChunkData.size) + j].type;
+					currentChunk.chunkData.data[i, j].amount = PlanetGenerator.getInstance().data[(x1 * ChunkData.size) + i, (y1 * ChunkData.size) + j].amount;
+					currentChunk.chunkData.data[i, j].endurance = PlanetGenerator.getInstance().data[(x1 * ChunkData.size) + i, (y1 * ChunkData.size) + j].endurance;
 				}
 			}
 			currentChunk.x = x1;

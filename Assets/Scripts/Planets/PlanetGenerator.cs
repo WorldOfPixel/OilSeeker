@@ -9,14 +9,18 @@ using UnityEngine;
  {
 	public int width = 1024;
 	public int height = 256;
-	public int [,] data;
+	public TILE [,] type;
+	public int[,] amount;
+	public int[,] endurance;
 
 	public PlanetData(int width, int height)
 	{
 		this.width = width;
 		this.height = height;
 
-		data = new int[this.width, this.height];
+		type = new TILE[this.width, this.height];
+		amount = new int[this.width, this.height];
+		endurance = new int[this.width, this.height];
 	}
 }
 
@@ -30,7 +34,7 @@ public class PlanetGenerator {
 	public float scale = 16f;
 	public float smoothness = 2f;
 
-	public int [,] data;
+	public TileData [,] data;
 	public bool isLoad {private set; get;}
 
 	public static PlanetGenerator getInstance()
@@ -55,7 +59,9 @@ public class PlanetGenerator {
 		{
 			for(int j = 0; j < height; j++)
 			{
-				planetData.data[i, j] = data[i, j];
+				planetData.type[i, j] = data[i, j].type;
+				planetData.amount[i, j] = data[i, j].amount;
+				planetData.endurance[i, j] = data[i, j].endurance;
 			}
 		}
 
@@ -78,13 +84,16 @@ public class PlanetGenerator {
 			width = planetData.width;
 			height = planetData.height;
 
-			data = new int[width, height];
+			data = new TileData[width, height];
 
 			for(int i = 0; i < width; i++)
 			{
 				for(int j = 0; j < height; j++)
 				{
-					data[i, j] = planetData.data[i, j];
+					data[i, j] = new TileData();
+					data[i, j].type = planetData.type[i, j];
+					data[i, j].amount = planetData.amount[i, j];
+					data[i, j].endurance = planetData.endurance[i, j];
 				}
 			}
 		}
@@ -97,12 +106,12 @@ public class PlanetGenerator {
 		isLoad = false;
 
 		seed = Random.Range(0, 999);
-		data = new int[width, height];
+		data = new TileData[width, height];
 
 		GenerateTerrain();
-		GenerateMines(8, 64, 2, 128, height - 64, height - 16);
-		GenerateMinerals(8, 128, 8, 256, height - 64, height - 28);
-		GenerateTunnels(-1, 128, 1, 256, 1024, 0, height);
+		GenerateMines(TILE.AIR, 64, 2, 128, height - 64, height - 16);
+		GenerateMinerals(TILE.ROCK, 128, 8, 256, height - 64, height - 28);
+		GenerateTunnels(TILE.AIR, 128, 1, 256, 1024, 0, height);
 
 		isLoad = true;
 	}
@@ -125,30 +134,31 @@ public class PlanetGenerator {
 
 			for(int j = 0; j < height; j++)
 			{
+				data[i, j] = new TileData();
 				// Generate layers
 				if(j < noise[7])
-					data[i, j] = 7;
+					data[i, j].SetValues(TILE.BASALT, 900, 100);
 				if(j >= noise[7] && j <= 32 + noise[6])
-					data[i, j] = 6;
+					data[i, j].type = TILE.GRANITE;
 				if(j >= 32 + noise[6] && j <= 64 + noise[5])
-					data[i, j] = 5;
+					data[i, j].type = TILE.SLATE;
 				if(j >= 64 + noise[5] && j <= 96 + noise[4])
-					data[i, j] = 4;
+					data[i, j].type = TILE.LIMESTONE;
 				if(j >= 96 + noise[4] && j <= 128 + noise[3])
-					data[i, j] = 3;
+					data[i, j].type = TILE.SANDSTONE;
 				if(j >= 128 + noise[3] && j <= 160 + noise[2])
-					data[i, j] = 2;
+					data[i, j].type = TILE.SAND;
 				if(j >= 160 + noise[2] && j <= 192 + noise[1])
-					data[i, j] = 1;
+					data[i, j].SetValues(TILE.CLAY, 900, 50);
 				if(j >= 192 + noise[1] && j <= 224 + noise[0])
-					data[i, j] = 0;
+					data[i, j].SetValues(TILE.DIRT, 900, 10);
 				if(j > 224 + noise[0])
-					data[i, j] = -1;
+					data[i, j].type = TILE.AIR;
 			}
 		}
 	}
 
-	void GenerateMines(int tile, int numOfMines = 128, int mMinSize = 4, int mMaxSize = 256, int minDepth = 0, int maxDepth = 16)
+	void GenerateMines(TILE tile, int numOfMines = 128, int mMinSize = 4, int mMaxSize = 256, int minDepth = 0, int maxDepth = 16)
 	{
 		int holeSize = 1;
 		for(int i = 0; i < numOfMines; i++)
@@ -166,8 +176,8 @@ public class PlanetGenerator {
 						{
 							Vector2 tilePos = new Vector2(xpos + x, ypos + y);
 							if(tilePos.x >= 0 && tilePos.x < width && tilePos.y >= minDepth && tilePos.y < maxDepth)
-								if(data[(int)tilePos.x, (int)tilePos.y] != -1)
-									data[(int)tilePos.x, (int)tilePos.y] = (int)tile;
+								if(data[(int)tilePos.x, (int)tilePos.y].type != TILE.AIR)
+									data[(int)tilePos.x, (int)tilePos.y].type = tile;
 						}
 					}
 				}
@@ -178,7 +188,7 @@ public class PlanetGenerator {
 			}
 		}
 	}
-	void GenerateMinerals(int tile, int numOfMinerals, int mMinSize = 4, int mMaxSize = 4, int minDepth = 0, int maxDepth = 16)
+	void GenerateMinerals(TILE tile, int numOfMinerals, int mMinSize = 4, int mMaxSize = 4, int minDepth = 0, int maxDepth = 16)
 	{
 		for (int i = 0; i < numOfMinerals; i++)
         {
@@ -192,8 +202,8 @@ public class PlanetGenerator {
             for (int j = 0; j < mSize; j++)
             {
 				if(xpos >= 0 && xpos < width && ypos >= minDepth && ypos < maxDepth) // Verify borders 
-					if(data[xpos, ypos] != (int)tile) // Verify data
-                		data[xpos, ypos] = (int)tile;
+					if(data[xpos, ypos].type != tile) // Verify data
+                		data[xpos, ypos].type = tile;
 
                 xpos += Random.Range(-1, 2);
 				ypos += Random.Range(-1, 2);
@@ -201,7 +211,7 @@ public class PlanetGenerator {
         }
 	}
 
-	void GenerateTunnels(int tile, int numOfTunnels, int holeSize, int tMinSize, int tMaxSize, int minDepth, int maxDepth)
+	void GenerateTunnels(TILE tile, int numOfTunnels, int holeSize, int tMinSize, int tMaxSize, int minDepth, int maxDepth)
 	{
 		for(int i = 0; i < numOfTunnels; i++)
 		{
@@ -222,7 +232,7 @@ public class PlanetGenerator {
 						ypos += y;
 
 						if(xpos >= 0 && xpos < width && ypos >= minDepth && ypos < maxDepth) // Verify borders 
-							data[xpos, ypos] = (int)tile;
+							data[xpos, ypos].type = tile;
 					}
 				}
 	
